@@ -16,7 +16,7 @@
     <p><button id=wordle>WORDLE</button>
     <button id=spellingbee>SPELLING BEE</button>
     <button id=boggle>BOGGLE</button>
-    <button id=maxiword>MAXIMOT</button>
+    <button id=maxiword>MAXIWORD</button>
     <button id=substrbutton>SUBSTRING</button>
     <p>
     <a id=shareEN onclick=share()>Share my scores</a>
@@ -185,7 +185,6 @@ LANG = 0;
 
   
 wordle.onclick = () => game(0);
-//motigma.onclick = () => game(1);
 spellingbee.onclick = () => game(2); 
 boggle.onclick = () => game(3); 
 maxiword.onclick = () => game(4);
@@ -408,82 +407,6 @@ onload = () => {
     substrboard.innerHTML = "<h3>_ " + substrword.substr(1,3) + " _</h3>";
     
     substrtotal.innerHTML = "Score: <span id=substrscore>0</span> / " + substrsolutions.length;
-    
-  // Maxiword7
-
-    maxiword7vowels = 0;
-    maxiword7counter = 0;
-    while(maxiword7vowels == 0){
-    
-      // all letters
-      maxiword7letters = "AAEEGNAOOTTWCIMOTUDISTTYEIOSSTDELRVYEHRTVWACHOPSHIMNUQEEINSUAFFKPSHLNNRZEEGHNWDEILRXELRTTYABBJOOAAEEGNAOOTTWCIMOTUDISTTYEIOSSTDELRVYEHRTVWACHOPSHIMNUQEEINSUAFFKPSHLNNRZEEGHNWDEILRXELRTTYABBJOO";
-      maxiword7vowels = 1;
-      maxiword7todayletters = [];
-      
-      // letters of the day
-      for(i = 0; i < 49; i++){
-        maxiword7todayletters.push(maxiword7letters[(maxiword7counter + days * 99 * i  + (LANG == 0 ? 99 : 0)) % maxiword7letters.length]);
-        maxiword7letters = maxiword7letters.replace(maxiword7todayletters[maxiword7todayletters.length-1],'');
-      }
-      
-
-      // strings (rows/cols) of the day
-      maxiword7todaystrings = [];
-
-      // rows
-      for(i = 0; i < 7; i++){
-        maxiword7todaystrings[i] = "";
-        for(j = 0; j < 7; j++){
-          maxiword7todaystrings[i] += maxiword7todayletters[i*7+j];
-        }
-      }
-
-      // cols
-      for(i = 0; i < 7; i++){
-        maxiword7todaystrings[i+7] = "";
-        for(j = 0; j < 7; j++){
-          maxiword7todaystrings[i+7] += maxiword7todayletters[j*7+i];
-        }
-      }
-      
-      for(i of maxiword7todaystrings){
-        if(!i.match(/[AEIOU]/)){
-          maxiword7vowels = 0;
-        }
-      }
-      maxiword7counter ++;
-    }
-
-    // board
-    maxiword7board.innerHTML =  "<br>" + maxiword7todayletters.join(" ").replace(/(. . . . . . .) ?/g,"$1<br>").replaceAll(" ", "");
-    
-    maxiword7inputs = 0;
-      
-    setTimeout(()=>{
-
-      // best scores of the day
-      maxiword7todaybestscore = 0;
-      
-      maxiword7todaybest = ["","","","","","","","","","", "", "", "", ""];
-      for(i = 0; i < 14; i++){
-        for(j = 0; j < words.length; j++){
-          if(words[j].length < 8 && words[j].length >= maxiword7todaybest[i].length){
-            if(isSubset(words[j], maxiword7todaystrings[i])){
-              maxiword7todaybest[i] = words[j];
-            }
-          }
-        }
-        maxiword7todaybestscore += maxiword7todaybest[i].length;
-        //window["maxiword7input" + i].value = maxiword7todaybest[i];
-        if(maxiword7todaybest[i].length == 0){
-          window["maxiword7input" + i].disabled = true;
-        }
-      }
-      
-      // result
-      maxiword7total.innerHTML = "Score: <span id=maxiword7score>0</span> / " + maxiword7todaybestscore;
-      
-    }, 100);
 }
 
 // Choose game
@@ -519,14 +442,6 @@ var game = game => {
   if(game == 5){
     pagesubstr.classList.remove("hidden");
     substrinput.focus();
-  }
-  
-  // maxiword7
-  if(game == 6){
-    pagemaxiword7.classList.remove("hidden");
-    maxiword7ok.click();
-    maxiword7input0.focus();
-    
   }
 }
 
@@ -703,7 +618,7 @@ maxiwordok.onclick = () => {
     }
     else {
       input.value = localStorage[currentday+"_maxiwordlatest"+i] || "";
-      if(input.value)  maxiwordok.onclick();
+      maxiwordtodayscore += input.value.length;
     }
   }
   maxiwordscore.innerHTML = maxiwordtodayscore;
@@ -762,49 +677,14 @@ showsubstr = () => {
 }
 
 
-// Maxiword7
-// =========
-
-// OK 
-maxiword7todayscore = 0;
-maxiword7ok.onclick = () => {
-  maxiword7todayscore = 0;
-  for(i = 0; i < 14; i++){
-    input = window["maxiword7input" + i];
-    value = input.value.trim();
-    if(value && isSubset(value, maxiword7todaystrings[i]) && words.includes(value)){
-      localStorage[currentday+"_maxiword7latest"+i] = value;
-      maxiword7todayscore += value.length;
-    }
-    else {
-      input.value = localStorage[currentday+"_maxiword7latest"+i] || "";
-      if(input.value) maxiword7ok.onclick();
-    }
-  }
-  maxiword7score.innerHTML = maxiword7todayscore;
-}
-
-showmaxiword7 = () => {
-  maxiword7result.innerHTML = "SOLUTIONS:<br><div id=maxi7columns>";
-  for(i = 0; i < 14; i++){
-    maxi7columns.innerHTML += (maxiword7todaybest[i].length ? maxiword7todaybest[i] : "(nothing)");
-    if(i != 14) maxi7columns.innerHTML += "<br>";
-    maxi7columns.innerHTML += " ";
-    window["maxiword7input" + i].disabled = true;
-  }
-}
-
-
 // Close game
 onclick = e => {
   if(e.target.classList.contains("x")){
     pagemenu.classList.remove("hidden");
     pagewordle.classList.add("hidden");
-    pagemotigma.classList.add("hidden");
     pagespellingbee.classList.add("hidden");
     pageboggle.classList.add("hidden");
     pagemaxiword.classList.add("hidden");
-    pagemaxiword7.classList.add("hidden");
     pagesubstr.classList.add("hidden");
     pagescore.classList.add("hidden");
   }
@@ -833,20 +713,7 @@ oninput = onfocus = onblur = onkeyup = (e) => {
   e.srcElement.value = accentsTidy(e.srcElement.value).toUpperCase().trim();
   if(e.key == "Enter" || e.key == "Tab"){
     maxiwordok.click();
-    maxiword7ok.click();
-    if(e.srcElement.id.includes("maxiword7input") && e.srcElement.value != ""){
-      id = e.srcElement.id.match(/7input(.*)/)[1];
-      if(window["maxiword7input" + (+id+1)] && !window["maxiword7input" + (+id+1)].disabled){
-        window["maxiword7input" + (+id+1)].focus();
-      }
-      else if(window["maxiword7input" + (+id+2)] && !window["maxiword7input" + (+id+2)].disabled){
-        window["maxiword7input" + (+id+2)].focus();
-      }
-      else if(window["maxiword7input" + (+id+3)] && !window["maxiword7input" + (+id+3)].disabled){
-        window["maxiword7input" + (+id+3)].focus();
-      }
-    }
-    else if(e.srcElement.id.includes("maxiwordinput") && e.srcElement.value != ""){
+    if(e.srcElement.id.includes("maxiwordinput") && e.srcElement.value != ""){
       id = e.srcElement.id.match(/input(.)/)[1];
       if(window["maxiwordinput" + (+id+1)] && !window["maxiwordinput" + (+id+1)].disabled){
         window["maxiwordinput" + (+id+1)].focus();
@@ -868,7 +735,6 @@ share = () => {
   if(window.shareEN){
     scoresEN = "I played Word Games in english!<br>";
     if(wordlewin) scoresEN += "Wordle: " + wordlewin + " tries<br>";
-    if(motigmawin) scoresEN += "Motigma: " + motigmawin + " tries<br>";
     if(spellingbeewordsfound.length) scoresEN += "Spelling Bee: " + spellingbeewordsfound.length + "/" + spellingbeesolutions.length + " words<br>";
     if(bogglewordsfound.length) scoresEN += "Boggle: " + bogglewordsfound.length + "/" + bogglewords.length + " words<br>";
     if(maxiwordtodayscore) scoresEN += "Maxiword: " + maxiwordtodayscore + "/" + maxiwordtodaybestscore + " points<br>";
@@ -880,11 +746,9 @@ share = () => {
   if(window.shareFR){
     scoresFR = "J'ai joué à Word Games en français!<br>";
     if(wordlewin) scoresFR += "Wordle: " + wordlewin + " essais<br>";
-    if(motigmawin) scoresFR += "Motigma: " + motigmawin + " essais<br>";
     if(spellingbeewordsfound.length) scoresFR += "Spelling Bee: " + spellingbeewordsfound.length + "/" + spellingbeesolutions.length + " mots<br>";
     if(bogglewordsfound.length) scoresFR += "Boggle: " + bogglewordsfound.length + "/" + bogglewords.length + " mots<br>";
     if(maxiwordtodayscore) scoresFR += "Maxiword: " + maxiwordtodayscore + "/" + maxiwordtodaybestscore + " points<br>";
-    if(maxiword7todayscore) scoresFR += "Maxiword 7x7: " + maxiword7todayscore + "/" + maxiword7todaybestscore + " points<br>";
     if(substrwordsfound.length) scoresFR += "Substring: " + substrwordsfound.length + "/" + substrsolutions.length + " points";
     pagescore.classList.remove("hidden");
     pagescoretxt.innerHTML = scoresFR;
